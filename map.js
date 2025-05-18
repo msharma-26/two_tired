@@ -80,8 +80,36 @@ let svg = d3.select('#map').select('svg');
     console.error('Error loading JSON:', error); // Handle errors
   }
 
+  console.log("got it")
+
+  const trips = await d3.csv('https://dsc106.com/labs/lab07/data/bluebikes-traffic-2024-03.csv');
+  const departures = d3.rollup(
+    trips,
+    (v) => v.length,
+    (d) => d.start_station_id,
+  );
+  const arrivals = d3.rollup(
+    trips,
+    (v) => v.length,
+    (d) => d.end_station_id,
+  );
+
+
   let stations = jsonData.data.stations;
+  stations = stations.map((station) => {
+  let id = station.short_name;
+  station.arrivals = arrivals.get(id) ?? 0;
+  station.departures = departures.get(id) ?? 0;
+  station.totalTraffic  = station.arrivals + station.departures;
+  return station;
+});
   console.log('Stations Array:', stations);
+
+  // want to make the size of the circles different for traffic to each station
+  const radiusScale = d3
+  .scaleSqrt()
+  .domain([0, d3.max(stations, (d) => d.totalTraffic)])
+  .range([0, 25]);
 
   // Append circles to the SVG for each station
 const circles = svg
@@ -89,11 +117,19 @@ const circles = svg
   .data(stations)
   .enter()
   .append('circle')
-  .attr('r', 5) // Radius of the circle
+  .attr('r', d => radiusScale(d.totalTraffic)) // Radius of the circle
   .attr('fill', 'steelblue') // Circle fill color
   .attr('stroke', 'white') // Circle border color
   .attr('stroke-width', 1) // Circle border thickness
-  .attr('opacity', 0.8); // Circle opacity
+  .attr('opacity', 0.8) // Circle opacity
+  .each(function (d) {
+    // Add <title> for browser tooltips
+    d3.select(this)
+      .append('title')
+      .text(
+        `${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`,
+      );
+  });
 
 // Function to update circle positions when the map moves/zooms
 function updatePositions() {
@@ -108,7 +144,6 @@ map.on('move', updatePositions); // Update during map movement
 map.on('zoom', updatePositions); // Update during zooming
 map.on('resize', updatePositions); // Update on window resize
 map.on('moveend', updatePositions); // Final adjustment after movement ends
-
 
 
 
