@@ -40,7 +40,7 @@ map.on('load', async () => {
     type: 'line',
     source: 'boston_route',
     paint: {
-      'line-color': 'green',
+      'line-color': 'darkgreen',
       'line-width': 3,
       'line-opacity': 0.4,
     },
@@ -57,7 +57,7 @@ map.addLayer({
     type: 'line',
     source: 'cam_route',
     paint: {
-      'line-color': 'purple',
+      'line-color': 'red',
       'line-width': 3,
       'line-opacity': 0.4,
     },

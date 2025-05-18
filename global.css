@@ -27,6 +27,34 @@ body {
   border-radius: 8px; /* Optional: rounded corners */
 }
 
+#map circle,
+.legend > div {
+  --color-departures: steelblue;
+  --color-arrivals: hotpink;
+  --color: color-mix(
+    in oklch,
+    var(--color-departures) calc(100% * var(--departure-ratio)),
+    var(--color-arrivals)
+  );
+  background-color: var(--color); /* For legend boxes */
+  fill: var(--color);             /* For SVG circles */
+}
+
+/* Legend layout */
+.legend {
+  display: flex;
+  gap: 1em;
+  margin-block: 1em;
+  font-size: 0.9em;
+}
+
+.legend > div {
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+}
+
 #map svg {
   position: absolute;
   z-index: 1;
@@ -36,15 +64,15 @@ body {
 
   circle {
     fill-opacity: 0.6;
-    fill: pink;
+    /* fill: pink; */
     stroke: white;
-  --color-departures: steelblue;
+  /* --color-departures: steelblue;
   --color-arrivals: darkorange;
   --color: color-mix(
       in oklch,
       var(--color-departures) calc(100% * var(--departure-ratio)),
       var(--color-arrivals));
-    fill: var(--color);
+    fill: var(--color); */
     /* fill: color-mix(in oklch, steelblue 50%, darkorange); */
   }
 }
@@ -57,5 +85,10 @@ header {
   label {
     margin-left: auto;
     display: block;
+  }
+
+  em {
+    color: grey;
+    opacity: 0.6;
   }
 }
