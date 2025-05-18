@@ -101,6 +101,9 @@ let svg = d3.select('#map').select('svg');
   const stations = computeStationTraffic(jsonData.data.stations)
   console.log('Stations Array:', stations);
 
+  let stationFlow = d3.scaleQuantize().domain([0, 1]).range([0, 0.5, 1]);
+
+
   // want to make the size of the circles different for traffic to each station
   const radiusScale = d3
   .scaleSqrt()
@@ -125,7 +128,10 @@ const circles = svg
       .text(
         `${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`,
       );
-  });
+  })
+  .style('--departure-ratio', (d) =>
+    stationFlow(d.departures / d.totalTraffic),
+  );
 
 // Function to update circle positions when the map moves/zooms
 function updatePositions() {
@@ -176,7 +182,10 @@ function updateScatterPlot(timeFilter) {
   circles
     .data(filteredStations, (d) => d.short_name) // Ensure D3 tracks elements correctly
     .join('circle') // Ensure the data is bound correctly
-    .attr('r', (d) => radiusScale(d.totalTraffic)); // Update circle sizes
+    .attr('r', (d) => radiusScale(d.totalTraffic)) // Update circle sizes
+    .style('--departure-ratio', (d) =>
+      stationFlow(d.departures / d.totalTraffic),
+    );
 }
 
 
@@ -240,7 +249,7 @@ function computeStationTraffic(stations, timeFilter = -1) {
     let id = station.short_name;
     station.arrivals = arrivals.get(id) ?? 0;
     station.departures = departures.get(id) ?? 0;
-    station.totalTraffic = station.arrivals = station.departures;
+    station.totalTraffic = station.arrivals + station.departures;
     // what you updated in step 4.2
     return station;
   });

@@ -38,6 +38,14 @@ body {
     fill-opacity: 0.6;
     fill: pink;
     stroke: white;
+  --color-departures: steelblue;
+  --color-arrivals: darkorange;
+  --color: color-mix(
+      in oklch,
+      var(--color-departures) calc(100% * var(--departure-ratio)),
+      var(--color-arrivals));
+    fill: var(--color);
+    /* fill: color-mix(in oklch, steelblue 50%, darkorange); */
   }
 }
 
